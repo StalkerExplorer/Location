@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="ViewCountSat">
+        <attr name="textSize" format= "dimension" />
+    </declare-styleable>
+
+	<declare-styleable name="BarGraph">
+		<attr name="BasebandCn0DbHz" format= "boolean" />
+    </declare-styleable>
+
+	<declare-styleable name="MyView">
+		<attr name="param" format= "string" />
+    </declare-styleable>
+</resources> 
