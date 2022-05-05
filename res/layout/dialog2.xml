@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+	xmlns:android="http://schemas.android.com/apk/res/android"
+	android:layout_width="match_parent"
+	android:layout_height="match_parent"
+	android:gravity="center">
+
+	<Button
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:text="Закрыть\nпрограмму"
+		android:layout_alignParentLeft="true"
+		android:layout_centerInParent="true"
+		android:id="@+id/dialog2Button1"
+		android:textSize="12sp"
+		android:layout_margin="10dp"
+		android:layout_weight="1.0"
+		android:background="@drawable/states_shapes"
+		android:textColor="@drawable/mycolor"/>
+
+	<Button
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:text="Открыть\nнастройки"
+		android:layout_centerInParent="true"
+		android:layout_alignParentRight="true"
+		android:id="@+id/dialog2Button2"
+		android:textSize="12sp"
+		android:layout_margin="10dp"
+		android:layout_weight="1.0"
+		android:background="@drawable/states_shapes"
+		android:textColor="@drawable/mycolor"/>
+
+</LinearLayout>
+

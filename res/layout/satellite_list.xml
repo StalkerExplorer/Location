@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+	xmlns:android="http://schemas.android.com/apk/res/android"
+	android:layout_width="match_parent"
+	android:layout_height="match_parent"
+	android:orientation="vertical">
+
+	<LinearLayout
+		android:orientation="vertical"
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content"
+		android:background="#FF222222"
+		android:id="@+id/satelliteHeaderLinearLayout1"
+		android:layout_gravity="center"
+		android:onClick="satelliteHeaderLayoutOncl">
+
+		<TextView
+			android:layout_width="match_parent"
+			android:layout_height="match_parent"
+			android:text="Working..."
+			android:textColor="#448AFF"
+			android:shadowColor="#101010"
+			android:shadowRadius="2.0"
+			android:shadowDx="2.0"
+			android:shadowDy="2.0"
+			android:layout_gravity="center"
+			android:gravity="top|center"
+			android:padding="3px"
+			android:id="@+id/satellitelistTextViewVisible"
+			android:textSize="15sp"
+			android:layout_weight="1.0"/>
+
+		<TextView
+			android:layout_width="match_parent"
+			android:layout_height="match_parent"
+			android:text="Working..."
+			android:textColor="#448AFF"
+			android:shadowColor="#101010"
+			android:shadowRadius="2.0"
+			android:shadowDx="2.0"
+			android:shadowDy="2.0"
+			android:layout_gravity="center"
+			android:gravity="top|center"
+			android:id="@+id/satellitelistTextViewUse"
+			android:textSize="15sp"
+			android:padding="3px"
+			android:layout_weight="1.0"/>
+
+		<ProgressBar
+			android:id="@+id/progressBar1"
+			style="?android:attr/progressBarStyleHorizontal"
+			android:layout_width="match_parent"
+			android:layout_height="10px"
+			android:layout_centerInParent="true"
+			android:indeterminate="true"
+			android:indeterminateBehavior="cycle"
+			android:indeterminateOnly="true"
+			android:indeterminateTint="#2d84ff"
+			android:indeterminateTintMode="src_in"/>
+
+		<TextView
+			android:layout_width="match_parent"
+			android:layout_height="match_parent"
+			android:text=""
+			android:textColor="#BDBDBD"
+			android:shadowColor="#101010"
+			android:shadowRadius="2.0"
+			android:shadowDx="2.0"
+			android:shadowDy="2.0"
+			android:layout_gravity="center"
+			android:gravity="center"
+			android:id="@+id/satelliteSort"
+			android:textSize="9sp"
+			android:layout_weight="1.0"
+			android:paddingBottom="3dp"/>
+
+	</LinearLayout>
+
+	<View
+		android:layout_width="match_parent"
+		android:layout_height="7px"
+		android:background="#000000"/>
+
+	<ScrollView
+		android:layout_width="match_parent"
+		android:layout_height="match_parent"
+		android:layout_weight="1.0"
+		android:id="@+id/satellitelistScrollView1">
+
+		<LinearLayout
+			android:orientation="vertical"
+			android:layout_width="match_parent"
+			android:layout_height="match_parent"
+			android:id="@+id/satelliteLinearLayout1">
+
+			<TextView
+				android:layout_width="match_parent"
+				android:layout_height="match_parent"
+				android:text=""
+				android:gravity="center"
+				android:padding="10dp"
+				android:textColor="#FE5723"
+				android:shadowDx="2.0"
+				android:shadowDy="2.0"
+				android:shadowRadius="2.0"
+				android:shadowColor="#101010"
+				android:id="@+id/satellitelistTextView1"
+				/>
+
+		</LinearLayout>
+
+	</ScrollView>
+
+</LinearLayout>
+
