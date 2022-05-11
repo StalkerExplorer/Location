@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="utf-8"?>
+	<LinearLayout
+		xmlns:android="http://schemas.android.com/apk/res/android"
+		android:layout_width="fill_parent"
+		android:layout_height="fill_parent"
+		android:orientation="horizontal"
+		android:gravity="center"
+		android:background="#212121"
+		android:id="@+id/iteitemLinearLayout">
+
+		<TextView
+			android:layout_width="match_parent"
+			android:layout_height="match_parent"
+			android:text="Svid"
+			android:gravity="center"
+			android:padding="2dp"
+			android:textColor="#FE5723"
+			android:shadowDx="2.0"
+			android:shadowDy="2.0"
+			android:shadowRadius="2.0"
+			android:shadowColor="#101010"
+			android:layout_weight="1.1"
+			android:layout_margin="1dp"
+			android:background="#252525"
+			android:id="@+id/textViewSvid"/>
+
+		<LinearLayout
+			android:layout_width="match_parent"
+			android:layout_height="match_parent"
+			android:gravity="center"
+			android:layout_weight="1.0"
+			android:layout_margin="1dp"
+			android:background="#252525"
+			android:orientation="vertical">
+
+			<ImageView
+				android:layout_width="match_parent"
+				android:layout_height="match_parent"
+				android:gravity="center"
+				android:layout_weight="1.0"
+				android:id="@+id/imageViewCountry"
+				android:paddingLeft="15dp"
+				android:paddingRight="15dp"/>
+
+			<TextView
+				android:layout_width="match_parent"
+				android:layout_height="match_parent"
+				android:text="Country"
+				android:gravity="center"
+				android:textColor="#FE5723"
+				android:shadowDx="2.0"
+				android:shadowDy="2.0"
+				android:shadowRadius="2.0"
+				android:shadowColor="#101010"
+				android:layout_weight="1"
+				android:id="@+id/textViewCountry1"/>
+
+		</LinearLayout>
+
+		<TextView
+			android:layout_width="match_parent"
+			android:layout_height="match_parent"
+			android:text="Baseband"
+			android:gravity="center"
+			android:padding="1dp"
+			android:textColor="#FE5723"
+			android:shadowDx="2.0"
+			android:shadowDy="2.0"
+			android:shadowRadius="2.0"
+			android:shadowColor="#101010"
+			android:layout_weight="1.0"
+			android:layout_margin="1dp"
+			android:background="#252525"
+			android:id="@+id/textViewBaseband"/>
+
+		<com.software1004developer.gps.view.MyViewBasebandCn0DbHz
+			android:layout_width="match_parent"
+			android:layout_height="match_parent"
+			android:gravity="center"
+			android:layout_weight="1.0"
+			android:layout_margin="1dp"
+			android:background="#252525"
+			android:id="@+id/myViewBasebandCn0DbHz"/>
+
+		<com.software1004developer.gps.view.MyViewElevation
+			android:layout_width="match_parent"
+			android:layout_height="match_parent"
+			android:gravity="center"
+			android:layout_weight="1.0"
+			android:layout_margin="1dp"
+			android:background="#252525"
+			android:id="@+id/myViewElevation"/>
+
+		<com.software1004developer.gps.view.MyViewAzimuth
+			android:layout_width="match_parent"
+			android:layout_height="match_parent"
+			android:gravity="center"
+			android:layout_weight="1.0"
+			android:layout_margin="1dp"
+			android:background="#252525"
+			android:id="@+id/myViewAzimuth"/>
+		
+	</LinearLayout>
+
+	
+
+
+
