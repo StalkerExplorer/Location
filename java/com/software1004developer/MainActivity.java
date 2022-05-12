@@ -33,7 +33,7 @@ import android.widget.AdapterView.*;
 public class MainActivity extends Activity implements SharedConstants
 {
 
-	
+
 	//поля класса
 	ListView listView;
 	//ArrayAdapter<String> adapter;
@@ -43,6 +43,8 @@ public class MainActivity extends Activity implements SharedConstants
 	int mysortI=0;
 	static boolean checkBoxBooleanTone=true;//звук
 	static boolean checkBoxBooleanVoice=true;//речь
+
+	HashMap myBooleanArray;
 	
 	//данные для адаптера//
 	String svid[];
@@ -52,12 +54,15 @@ public class MainActivity extends Activity implements SharedConstants
 	public static float elevation[];
 	public static float azimuth[];
 	ArrayList arrayLis;
+	ArrayList array;
 	HashMap hashMap;
 
 	public static boolean usedInFix[];
-	
-	
-	
+
+	long startTime;
+	long endTime;
+	long resultTime;
+
     // это будет именем файла настроек:
 	public static final String APP_PREFERENCES = "mysettings"; 
 	SharedPreferences mSettings;
@@ -85,7 +90,7 @@ public class MainActivity extends Activity implements SharedConstants
 	boolean poor_gps_boolean;
 	ExecutorService executor;
 	boolean myBoolean;
-	
+
 
 	public static String provider=new String("");
 	static Tone tone;
@@ -104,8 +109,8 @@ public class MainActivity extends Activity implements SharedConstants
 	float summCn0DbHz=0;
 	float averageUseCn0DbHz=0;
 
-	
-	
+
+
 	boolean booleanBEIDOU=true;
 	boolean booleanGALILEO=true;
 	boolean booleanGLONASS=true;
@@ -120,8 +125,8 @@ public class MainActivity extends Activity implements SharedConstants
 	int count1=0;
 	ArrayList <String> strArray;
 	int j=0;
-	
-	
+
+
 
 	//разметка первой страницы (layout mylocation):
 	CheckBox checkBox1;//звук
@@ -168,7 +173,7 @@ public class MainActivity extends Activity implements SharedConstants
 	//разметка третьй станицы
 	BarGraph barGraphSkyBasebandCn0DbHz;
 	BarGraph barGraphSkyCn0DbHz;
-	
+
 	TextView skyTextView;//"показывать только GPS и тд."
     ViewCountSat viewCountSatSky;
 	//разметка третьй станицы
@@ -180,7 +185,7 @@ public class MainActivity extends Activity implements SharedConstants
 	//>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 	public void permission(){//инициируем
 		if(hasPermission()){ //sb.append("Выполняем код, потому что есть разрешения");
-		metod2();//выполняем остальной код
+			metod2();//выполняем остальной код
 		} else {//Если разрешения нет, то нам надо его запросить. 
 			//Это выполняется методом requestPermissions. 
 			ActivityCompat.requestPermissions(this, new String[] {//Manifest.permission.ACCESS_BACKGROUND_LOCATION,
@@ -219,13 +224,13 @@ public class MainActivity extends Activity implements SharedConstants
 				if (grantResults.length > 0
 					&& grantResults[0] == PackageManager.PERMISSION_GRANTED
 					&& grantResults[1] == PackageManager.PERMISSION_GRANTED) {
-						
-						//пользователь предоставил нужные разрешения
-						metod2();//выполняем остальной код
-						
-						} 
-					
-					
+
+					//пользователь предоставил нужные разрешения
+					metod2();//выполняем остальной код
+
+				} 
+
+
 				//иначе пользователь отказал в разрешении или выбрал не те (нам нужно в любом режиме)
 				else {
 
@@ -248,16 +253,16 @@ public class MainActivity extends Activity implements SharedConstants
 		intent.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
 		intent.addFlags(Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS);
 		startActivityForResult(intent, PERMISSION_REQUEST_CODE);
-		
+
     }
 
 
-	
+
 
 	@Override
 	public Dialog onCreateDialog(int id) {
-		
-		
+
+
 		AlertDialog dialog=null;
 		AlertDialog.Builder adb;// = new AlertDialog.Builder(MainActivity.this);
 		View myView;
@@ -266,9 +271,17 @@ public class MainActivity extends Activity implements SharedConstants
 		LinearLayout.LayoutParams lParams;
 		Button button1;
 		Button button2;
-		
+		CheckBox chbGPS;
+		CheckBox chbGLONASS;
+		CheckBox chbGALILEO;
+		CheckBox chbBEIDOU;
+		CheckBox chbQZSS;
+		CheckBox chbIRNSS;
+		CheckBox chbSBAS;
+		CheckBox chbUNKNOWN;
+
 		switch (id){
-			
+
 			case 1:
 				adb = new AlertDialog.Builder(MainActivity.this);
 				myView= getLayoutInflater().inflate(R.layout.dialog1,null);
@@ -314,8 +327,8 @@ public class MainActivity extends Activity implements SharedConstants
 					});
 				//return dialog;
 				break;
-			
-			
+
+
 			case 2:
 				adb = new AlertDialog.Builder(MainActivity.this);
 				myView= getLayoutInflater().inflate(R.layout.dialog2,null);
@@ -364,17 +377,84 @@ public class MainActivity extends Activity implements SharedConstants
 						}
 					});
 				//return dialog;
-			break;
-			
+				break;
+				
+				
+			case 3:
+				adb = new AlertDialog.Builder(MainActivity.this,R.style.MyDialogTheme);
+				myView= getLayoutInflater().inflate(R.layout.dialog3,null);
+				adb.setView(myView);
+				// создаем диалог
+				dialog=adb.create();
+				//dialog.getWindow().setBackgroundDrawableResource(R.color.transparent);
+				dialog.getWindow().setBackgroundDrawableResource(R.drawable.dialog_rectangle_rounded_all);
+				// заголовок (создаем TextView, и устанавливаем в качестве заголовка)
+				myTextView=new TextView(MainActivity.this);
+				lParams=new LinearLayout.LayoutParams(LayoutParams.WRAP_CONTENT,LayoutParams.WRAP_CONTENT);
+				myTextView.setLayoutParams(lParams);
+				myTextView.setText("Показать в списке только:");
+				myTextView.setTextSize(18);
+				myTextView.setTypeface(myTextView.getTypeface(), Typeface.BOLD);
+				myTextView.setGravity(Gravity.CENTER);
+				myTextView.setPadding(10,10,10,10);
+				myTextView.setTextColor(Color.parseColor("#BDBDBD"));//9E9E9E
+				myTextView.setShadowLayer(2,2,2,Color.parseColor("#101010"));
+				dialog.setCustomTitle(myTextView);
+
+
+				//найдем чекбоксы, отметим чекнуты они или нет, и назначим им слушателя
+				chbGPS=myView.findViewById(R.id.checkBoxGPS);
+				chbGLONASS=myView.findViewById(R.id.checkBoxGLONASS);
+				chbGALILEO=myView.findViewById(R.id.checkBoxGALILEO);
+				chbBEIDOU=myView.findViewById(R.id.checkBoxBEIDOU);
+				chbQZSS=myView.findViewById(R.id.checkBoxQZSS);
+				chbIRNSS=myView.findViewById(R.id.checkBoxIRNSS);
+				chbSBAS=myView.findViewById(R.id.checkBoxSBAS);
+				chbUNKNOWN=myView.findViewById(R.id.checkBoxUNKNOWN);
+
+				chbGPS.setChecked((boolean)myBooleanArray.get("GPS"));
+				chbGLONASS.setChecked((boolean)myBooleanArray.get("GLONASS"));
+				chbGALILEO.setChecked((boolean)myBooleanArray.get("GALILEO"));
+				chbBEIDOU.setChecked((boolean)myBooleanArray.get("BEIDOU"));
+				chbQZSS.setChecked((boolean)myBooleanArray.get("QZSS"));
+				chbIRNSS.setChecked((boolean)myBooleanArray.get("IRNSS"));
+				chbSBAS.setChecked((boolean)myBooleanArray.get("SBAS"));
+				chbUNKNOWN.setChecked((boolean)myBooleanArray.get("UNKNOWN"));
+
+				chbGPS.setOnCheckedChangeListener(onchDialog);
+				chbGLONASS.setOnCheckedChangeListener(onchDialog);
+				chbGALILEO.setOnCheckedChangeListener(onchDialog);
+				chbBEIDOU.setOnCheckedChangeListener(onchDialog);
+				chbQZSS.setOnCheckedChangeListener(onchDialog);
+				chbSBAS.setOnCheckedChangeListener(onchDialog);
+				chbUNKNOWN.setOnCheckedChangeListener(onchDialog);
+				chbIRNSS.setOnCheckedChangeListener(onchDialog);
+
+	
+				//теперь назначим обработчик клавише "назад" (во время открытого диалогового окна, его нужно назначать тут)
+				dialog. setOnKeyListener(new DialogInterface.OnKeyListener() {
+						@Override
+						public boolean onKey (DialogInterface dialog, int keyCode, KeyEvent event) {
+							if (keyCode == KeyEvent.KEYCODE_BACK){
+								dismissDialog(3);
+								return true;
+							}
+							return false;
+						}
+					});
+				//return dialog;
+				break;
+				
+
 		}
-		
-		
+
+
 		//super.onCreateDialog(id);
 		return dialog;
-		 
-		
+
+
     }
-	
+
     //обработчик кнопок диалога:
 	OnClickListener myButtonDialog = new OnClickListener(){
 
@@ -383,7 +463,7 @@ public class MainActivity extends Activity implements SharedConstants
 		{
 			switch (p1.getId()){
 
-				
+
 					//privacy_policy//privacy_policy//privacy_policy
 				case R.id.dialog1Button1:
 					editor.putBoolean(PRIVAC_POLIC, false);//кладём что не согласились с политикой конфиденциальности
@@ -400,8 +480,8 @@ public class MainActivity extends Activity implements SharedConstants
 					vibracia();
 					break;
 					//privacy_policy//privacy_policy//privacy_policy
-					
-					
+
+
 				case R.id.dialog2Button1:
 					dismissDialog(2);
 				    vibracia();
@@ -419,7 +499,61 @@ public class MainActivity extends Activity implements SharedConstants
 	};
 	//>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 	//>>>>>>РАЗРЕШЕНИЯ RUNTIME>>>>>>>>>>
-	
+
+	//слушатель чекбоксов диалогового окна второй стр
+	OnCheckedChangeListener onchDialog=new OnCheckedChangeListener(){
+
+		@Override
+		public void onCheckedChanged(CompoundButton p1, boolean p2)
+		{
+			switch(p1.getId()){//switch(p1.getId()){
+
+				case R.id.checkBoxGPS:
+					myBooleanArray.put("GPS",p2);//переписываем значение по ключу
+				    break;
+
+				case R.id.checkBoxGLONASS:
+					myBooleanArray.put("GLONASS",p2);
+					break;
+
+				case R.id.checkBoxGALILEO:
+					myBooleanArray.put("GALILEO",p2);
+					break;
+
+				case R.id.checkBoxBEIDOU:
+					myBooleanArray.put("BEIDOU",p2);
+					break;
+
+				case R.id.checkBoxQZSS:
+					myBooleanArray.put("QZSS",p2);
+					break;
+
+				case R.id.checkBoxSBAS:
+					myBooleanArray.put("SBAS",p2);
+					break;
+
+				case R.id.checkBoxIRNSS:
+					myBooleanArray.put("IRNSS",p2);
+					break;
+
+				case R.id.checkBoxUNKNOWN:
+					myBooleanArray.put("UNKNOWN",p2);
+					break;
+
+			}//switch(p1.getId()){
+
+
+			if(count!=0){//если есть хотя бы 1 спутник в поле зрения
+				mysort();//вызываем метод сортировки
+			}
+
+			listView.smoothScrollToPosition(0);
+
+			vibracia();
+		}
+
+
+	};
 	
 
 
@@ -428,27 +562,27 @@ public class MainActivity extends Activity implements SharedConstants
 	protected void onActivityResult(int requestCode, int resultCode, Intent data)
 	{
 
-		
-		
+
+
 		switch(requestCode){
 
 				//если мы возвращались из манипуляций с разрешениями о местоположении
 				//тогда был отправлен PERMISSION_REQUEST_CODE, который сюда пришел
 			case PERMISSION_REQUEST_CODE:
 				if(hasPermission()){
-					
-					
+
+
 					//пользователь предоставил нужные разрешения
 					metod2();//выполняем остальной код
-					
+
 					//Toaster.toast("hasPermission");
-					
+
 				}else{
-					
+
 					//пользователь не предоставил нужные разрешения
 					showDialog(2);//снова показываем диалог
 					//Toaster.toast("else");
-					
+
 				}
 				break;
 
@@ -494,10 +628,10 @@ public class MainActivity extends Activity implements SharedConstants
 					textViewSetting.setEllipsize(null);
 					buttonSetting.setText("Настройки");
 
-					
-					
-					
-					
+
+
+
+
 					//запускаем сервис
 					// используем явный вызов службы
 					startForegroundService(
@@ -511,13 +645,13 @@ public class MainActivity extends Activity implements SharedConstants
 				}
 				break;
 		}
-		
-		
+
+
 		if(viewPager!=null){
-		//просим адаптер обновить данные:
-		viewPagerAdapter.notifyDataSetChanged();
+			//просим адаптер обновить данные:
+			viewPagerAdapter.notifyDataSetChanged();
 		}
-		
+
 		super.onActivityResult(requestCode, resultCode, data);
 
 
@@ -534,30 +668,31 @@ public class MainActivity extends Activity implements SharedConstants
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
-		
+
 		mContext=getApplicationContext();
-		
+
 		//было в metod2
 		viewPager=findViewById(R.id.viewPager2);
 		viewPagerAdapter=new ViewPagerAdapter();
 		viewPager.setAdapter(viewPagerAdapter);
 		viewPager.registerOnPageChangeCallback(onPageChangeCallback);//регистрируем Listener
         //было в metod2
+		myBooleanArray=new HashMap();
 		
 		if(privacePolicy()){
 			permission();
 		}else{
 			showDialog(1);
 		}
-		
+
     }//закрылся onCreate()
 
 
-	
-	
-	
+
+
+
 	public boolean privacePolicy(){
-		
+
 		privacy_policy_Boolean=false;
 		mSettings = getSharedPreferences(APP_PREFERENCES, Context.MODE_PRIVATE);
 		editor = mSettings.edit();
@@ -566,32 +701,45 @@ public class MainActivity extends Activity implements SharedConstants
 		if(mSettings.contains(PRIVAC_POLIC)) {
 			privacy_policy_Boolean= mSettings.getBoolean(PRIVAC_POLIC, false);
 		}
-		
-		
+
+
 		//если privacy policy проходили до этого, то она инициализирована true
 		return privacy_policy_Boolean;
 	}
-	
-	
-	
-	
-	
-	
-	
-	
+
+
+
+
+
+
+
+
 	//metod2//если успешно прошли privacy_policy
 	//и уже есть разрешения на доступ к местоположению
 	public void metod2(){
-		
+
 		/*
-		viewPager=findViewById(R.id.viewPager2);
-		viewPagerAdapter=new ViewPagerAdapter();
-		viewPager.setAdapter(viewPagerAdapter);
-		viewPager.registerOnPageChangeCallback(onPageChangeCallback);//регистрируем Listener
-        */
-		
+		 viewPager=findViewById(R.id.viewPager2);
+		 viewPagerAdapter=new ViewPagerAdapter();
+		 viewPager.setAdapter(viewPagerAdapter);
+		 viewPager.registerOnPageChangeCallback(onPageChangeCallback);//регистрируем Listener
+		 */
+
 		//Проверим "Локацию" в настройках системы. Вкл/Выкл
 		provider = Settings.Secure.getString(getContentResolver(), Settings.Secure.LOCATION_PROVIDERS_ALLOWED);
+
+		
+		/*
+		boolean b=true;
+		myBooleanArray.put("BEIDOU",b);
+		myBooleanArray.put("GALILEO",b);
+		myBooleanArray.put("GLONASS",b);
+		myBooleanArray.put("GPS",b);
+		myBooleanArray.put("IRNSS",b);
+		myBooleanArray.put("QZSS",b);
+		myBooleanArray.put("SBAS",b);
+		myBooleanArray.put("UNKNOWN",b);
+		*/
 		
 		//экземпляр класса с тональником (в нем метод, где есть звук "beep-beep" во время фиксации позиции)
 		tone=new Tone(ToneGenerator.TONE_PROP_BEEP,300);
@@ -607,8 +755,8 @@ public class MainActivity extends Activity implements SharedConstants
         mLocationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
 		gnssStatusCallback=new GnssStatusCallback();
 
-		
-			if((!provider.equals(""))){//если GPS включен
+
+		if((!provider.equals(""))){//если GPS включен
 			//запускаем сервис
 			// используем явный вызов службы
 			startForegroundService(
@@ -618,14 +766,14 @@ public class MainActivity extends Activity implements SharedConstants
 
 			MainActivity. mLocationManager.registerGnssStatusCallback(gnssStatusCallback);
 			viewPager.setUserInputEnabled(true);//делаем доступным скроллирование страниц viewPager2
-			}//если GPS включен
-			else{//иначе GPS выключен
-				viewPager.setUserInputEnabled(false);//блокируем скроллирование страниц viewPager2
-			}
-			
-			
-		
-		
+		}//если GPS включен
+		else{//иначе GPS выключен
+			viewPager.setUserInputEnabled(false);//блокируем скроллирование страниц viewPager2
+		}
+
+
+
+
 		//каналы для уведомлений//
 		//перед созданием каналов
 		//получаем notificationManager:
@@ -649,18 +797,18 @@ public class MainActivity extends Activity implements SharedConstants
 
 		//уведомление в строке состояния:
 		//mNotificationManager.notify(NOTIFY_ID, getNotification());
-		
-		
+
+
 		//boolean переменная звукового уведомления
 		if(mSettings.contains("checkBoxBooleanTone")){
 			checkBoxBooleanTone=mSettings.getBoolean("checkBoxBooleanTone",true);
 		}
-		
+
 		if(mSettings.contains("checkBoxBooleanVoice")){
 			checkBoxBooleanTone=mSettings.getBoolean("checkBoxBooleanVoice",true);
 		}
-		
-		
+
+
 	}//metod2//если успешно прошли privacy_policy
 
 
@@ -670,88 +818,113 @@ public class MainActivity extends Activity implements SharedConstants
 		@Override
 		public void onCheckedChanged(CompoundButton p1, boolean p2)
 		{
-			
+
 			switch(p1.getId()){
-				
+
 				case R.id.mylocationCheckBox1:
-			checkBoxBooleanTone=p2;
-			checkBox1.setChecked(checkBoxBooleanTone);
-			    break;
-			
+					checkBoxBooleanTone=p2;
+					checkBox1.setChecked(checkBoxBooleanTone);
+					break;
+
 				case R.id.mylocationCheckBox2:
-			checkBoxBooleanVoice=p2;
-			checkBox2.setChecked(checkBoxBooleanVoice);
-				break;
-				
+					checkBoxBooleanVoice=p2;
+					checkBox2.setChecked(checkBoxBooleanVoice);
+					break;
+
 			}
 			vibracia();
 		}
 	};
-	
+
 
 
 	@Override
     protected void onResume() {
+		
+		//извлекаем чекнуты ли чекбоксы 2стр
+		//и сразу заполняем массив
+		myBooleanArray.put("BEIDOU",   mSettings.getBoolean("BEIDOU", true)  );
+		myBooleanArray.put("GALILEO",  mSettings.getBoolean("GALILEO", true) );
+		myBooleanArray.put("GLONASS",  mSettings.getBoolean("GLONASS", true) );
+		myBooleanArray.put("GPS",      mSettings.getBoolean("GPS", true)     );
+		myBooleanArray.put("IRNSS",    mSettings.getBoolean("IRNSS", true)   );
+		myBooleanArray.put("QZSS",     mSettings.getBoolean("QZSS", true)    );
+		myBooleanArray.put("SBAS",     mSettings.getBoolean("SBAS", true)    );
+		myBooleanArray.put("UNKNOWN",  mSettings.getBoolean("UNKNOWN", true) );
+		
         super.onResume();
     }
 
 	@Override
     public void onPause() {
-		
-		
+
+
 		editor.putBoolean("checkBoxBoolean", checkBoxBooleanTone);
 		editor.putBoolean("checkBoxBoolean", checkBoxBooleanVoice);
+		
+		
+		//чекнуты ли чекбоксы диалога 2стр
+		editor.putBoolean("GPS",(boolean)myBooleanArray.get("GPS"));
+		editor.putBoolean("GLONASS",(boolean)myBooleanArray.get("GLONASS"));
+		editor.putBoolean("GALILEO",(boolean)myBooleanArray.get("GALILEO"));
+		editor.putBoolean("BEIDOU",(boolean)myBooleanArray.get("BEIDOU"));
+		editor.putBoolean("QZSS",(boolean)myBooleanArray.get("QZSS"));
+		editor.putBoolean("IRNSS",(boolean)myBooleanArray.get("IRNSS"));
+		editor.putBoolean("SBAS",(boolean)myBooleanArray.get("SBAS"));
+		editor.putBoolean("UNKNOWN",(boolean)myBooleanArray.get("UNKNOWN"));
+		
+		
 		editor.apply();
         super.onPause();
     }
 
 
 	/*@Override
-	public void finish()
-	{
-		
-		
-		//в определенных случаях мы дважды проходим finish() (это может вызвать сбой)
-		if(mSettings.getBoolean(PRIVAC_POLIC, false)){//если успешно прошли privacy_policy, //то у нас уже запущено много всего
-		if(hasPermission()){//но запущено в случае наличия разрешений на местоположение
-		
-		
-//if(!provider.equals("")){//если GPS включен
-		//уничтожаем сервис:
-		stopService(
-			new Intent(MainActivity.this, MyService.class));
+	 public void finish()
+	 {
 
-		MainActivity. mLocationManager.unregisterGnssStatusCallback(gnssStatusCallback);
-		
-		
-		//playNotification.stop();//уведомление "плохие условия приема"
-		if(worker.t!=null){//
-			//worker.t!=null если хоть раз выполнялся код в run()
-			//хоть раз выполнится код в run(), в случае: executor.execute(worker);
-			worker.t.interrupt();
-		}
 
-		executor.shutdownNow();// После этого исполнитель перестанет принимать какие-либо новые потоки и завершит все существующие в очереди 
-//}////если GPS включен
-		
-			//Toaster.toast("finish()  " +myCount);
-			
-			
-			super.finish();
-		}//но запущено в случае наличия разрешений на местоположение
-		}//если успешно прошли privacy_policy
-		else{//иначе мы ещё не прошли privacy_policy
-			//Toaster.toast("finish()  "+myCount);
-			super.finish();//просто закрываем программу, не останавливаем никакие сервисы как выше в коде
-		}
-		
-		super.finish();
-		
-	}*/
+	 //в определенных случаях мы дважды проходим finish() (это может вызвать сбой)
+	 if(mSettings.getBoolean(PRIVAC_POLIC, false)){//если успешно прошли privacy_policy, //то у нас уже запущено много всего
+	 if(hasPermission()){//но запущено в случае наличия разрешений на местоположение
 
-	
-	
-	
+
+	 //if(!provider.equals("")){//если GPS включен
+	 //уничтожаем сервис:
+	 stopService(
+	 new Intent(MainActivity.this, MyService.class));
+
+	 MainActivity. mLocationManager.unregisterGnssStatusCallback(gnssStatusCallback);
+
+
+	 //playNotification.stop();//уведомление "плохие условия приема"
+	 if(worker.t!=null){//
+	 //worker.t!=null если хоть раз выполнялся код в run()
+	 //хоть раз выполнится код в run(), в случае: executor.execute(worker);
+	 worker.t.interrupt();
+	 }
+
+	 executor.shutdownNow();// После этого исполнитель перестанет принимать какие-либо новые потоки и завершит все существующие в очереди 
+	 //}////если GPS включен
+
+	 //Toaster.toast("finish()  " +myCount);
+
+
+	 super.finish();
+	 }//но запущено в случае наличия разрешений на местоположение
+	 }//если успешно прошли privacy_policy
+	 else{//иначе мы ещё не прошли privacy_policy
+	 //Toaster.toast("finish()  "+myCount);
+	 super.finish();//просто закрываем программу, не останавливаем никакие сервисы как выше в коде
+	 }
+
+	 super.finish();
+
+	 }*/
+
+
+
+
 	@Override
 	protected void onDestroy()
 	{
@@ -789,38 +962,34 @@ public class MainActivity extends Activity implements SharedConstants
 			//Toaster.toast("finish()  "+myCount);
 			super.finish();//просто закрываем программу, не останавливаем никакие сервисы как выше в коде
 		}
-		
+
 		super.onDestroy();
 	}
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
+
+
+
+
+
+
+
+
+
+
+
 //обновлять элементы GUI из дочернего потока нельзя
 //мы используем Handler
-public static  Handler  handler = new Handler(){
-public void handleMessage(Message msg){
-super.handleMessage(msg);
+	public static  Handler  handler = new Handler(){
+		public void handleMessage(Message msg){
+			super.handleMessage(msg);
 
-switch(msg.what){
+			switch(msg.what){
 
-case 0:
-facadeRenovation();//обновляем view в разметках (view.invalidate())
-break;
-}
-}
-};
-	
-	
-
-	
+				case 0:
+					facadeRenovation();//обновляем view в разметках (view.invalidate())
+					break;
+			}
+		}
+	};
 
 
 
@@ -833,7 +1002,11 @@ break;
 
 
 
-	
+
+
+
+
+
 
 
 
@@ -880,62 +1053,62 @@ break;
 
 
 	/*//метод для показа уведомлений (мы его не вызываем пока)
-	public void notification(int countUsedFix){
-		// Create PendingIntent
-		//Чтобы выполнить какое-либо действие по нажатию на уведомление,
-		//необходимо использовать PendingIntent. PendingIntent - это контейнер для Intent. 
-		//Этот контейнер может быть использован для последующего запуска вложенного в него Intent.
-		//https://startandroid.ru/ru/uroki/vse-uroki-spiskom/509-android-notifications-osnovy.html
-		Intent notificationIntent = new Intent(this, MainActivity.class);
-		PendingIntent contentIntent = PendingIntent.getActivity(this,
-																0, notificationIntent,
-																PendingIntent.FLAG_CANCEL_CURRENT);
+	 public void notification(int countUsedFix){
+	 // Create PendingIntent
+	 //Чтобы выполнить какое-либо действие по нажатию на уведомление,
+	 //необходимо использовать PendingIntent. PendingIntent - это контейнер для Intent. 
+	 //Этот контейнер может быть использован для последующего запуска вложенного в него Intent.
+	 //https://startandroid.ru/ru/uroki/vse-uroki-spiskom/509-android-notifications-osnovy.html
+	 Intent notificationIntent = new Intent(this, MainActivity.class);
+	 PendingIntent contentIntent = PendingIntent.getActivity(this,
+	 0, notificationIntent,
+	 PendingIntent.FLAG_CANCEL_CURRENT);
 
 
-		// Create Notification
-		//Используем билдер, в котором указываем иконку, 
-		//заголовок и текст для уведомления. 
-		NotificationCompat.Builder builder =
-			new NotificationCompat.Builder(this, countUsedFix==0?CHANNEL_ID_2:CHANNEL_ID_1)
-			.setSmallIcon(R.drawable.location)
-			.setContentTitle("Напоминание")
-			.setContentText("Пора покормить кота")
-			//.setContent(views);
-			.setContentIntent(contentIntent);
+	 // Create Notification
+	 //Используем билдер, в котором указываем иконку, 
+	 //заголовок и текст для уведомления. 
+	 NotificationCompat.Builder builder =
+	 new NotificationCompat.Builder(this, countUsedFix==0?CHANNEL_ID_2:CHANNEL_ID_1)
+	 .setSmallIcon(R.drawable.location)
+	 .setContentTitle("Напоминание")
+	 .setContentText("Пора покормить кота")
+	 //.setContent(views);
+	 .setContentIntent(contentIntent);
 
 
-		//Методом build получаем готовое уведомление.
-		Notification notification =builder.build();
+	 //Методом build получаем готовое уведомление.
+	 Notification notification =builder.build();
 
 
-		//когда надо показать уведомление пользователю, вызывается метод notify() 
-		//notificationManager'а
-		mNotificationManager.notify(NOTIFY_ID, notification);
-	}//закрылся public void notification(){*/
+	 //когда надо показать уведомление пользователю, вызывается метод notify() 
+	 //notificationManager'а
+	 mNotificationManager.notify(NOTIFY_ID, notification);
+	 }//закрылся public void notification(){*/
 
 
 	//метод озвучивания "уведомлений"
 	public static void playNotificationSound(Uri uriSound) {//public void playNotificationSound
 
-	
-		if(checkBoxBooleanVoice){//if(checkBoxBooleanVoice
-		try {
 
-			if(r!=null){
-				r.stop();
-				r=null;
+		if(checkBoxBooleanVoice){//if(checkBoxBooleanVoice
+			try {
+
+				if(r!=null){
+					r.stop();
+					r=null;
+				}
+
+
+				r = RingtoneManager.getRingtone(mContext, uriSound);
+				r.play(); 
+			} catch (Exception e) {
+				//Toaster.toast("playNotificationSound(): \n\n"+e.toString());
+				Toast.makeText(mContext, "playNotificationSound(): \n\n"+e.toString(), Toast.LENGTH_LONG).show();
 			}
 
-
-			r = RingtoneManager.getRingtone(mContext, uriSound);
-			r.play(); 
-		} catch (Exception e) {
-			//Toaster.toast("playNotificationSound(): \n\n"+e.toString());
-			Toast.makeText(mContext, "playNotificationSound(): \n\n"+e.toString(), Toast.LENGTH_LONG).show();
-		}
-		
 		}//if(checkBoxBooleanVoice
-		
+
 	}//закрылся public void playNotificationSound
 
 
@@ -1002,102 +1175,102 @@ break;
 		}
 	};
 
-	
-	
-	
-	
-	
-	
-	
-	public void onclSky(View v){
-		
-		
-		
-		
 
-	
+
+
+
+
+
+
+	public void onclSky(View v){
+
+
+
+
+
+
 		strArray = new ArrayList();
-		
-		
-		
-		
-		
-		
-		
+
+
+
+
+
+
+
 		//mInt связан с количеством нажатий (нужен для блока кода внизу: if(j<mInt){j++;}else{j=0;})
 		//существующие в данный момент нам нужны:
 		for (MySatellite s : arraySat) {//цикл
-			
-			
+
+
 			if(booleanBEIDOU&&(s.getConstellationType().equals("BEIDOU"))){
 				mInt++;//инкрименируем
 				booleanBEIDOU=false;//и сюда больше не попадаем, в случае нахождения ещё "BEIDOU"
 				strArray.add("BEIDOU");
 			}
-			
+
 			if(booleanGALILEO&&(s.getConstellationType().equals("GALILEO"))){
 				mInt++;//инкрименируем
 				booleanGALILEO=false;//и сюда больше не попадаем, в случае нахождения ещё "GALILEO"
 				strArray.add("GALILEO");
 			}
-			
+
 			if(booleanGLONASS&&(s.getConstellationType().equals("GLONASS"))){
 				mInt++;//инкрименируем
 				booleanGLONASS=false;//и сюда больше не попадаем, в случае нахождения ещё "GLONASS"
 				strArray.add("GLONASS");
 			}
-			
+
 			if(booleanGPS&&(s.getConstellationType().equals("GPS"))){
 				mInt++;//инкрименируем
 				booleanGPS=false;//и сюда больше не попадаем, в случае нахождения ещё "GPS"
 				strArray.add("GPS");
 			}
-			
+
 			if(booleanIRNSS&&(s.getConstellationType().equals("IRNSS"))){
 				mInt++;//инкрименируем
 				booleanIRNSS=false;//и сюда больше не попадаем, в случае нахождения ещё "IRNSS"
 				strArray.add("IRNSS");
 			}
-			
+
 			if(booleanQZSS&&(s.getConstellationType().equals("QZSS"))){
 				mInt++;//инкрименируем
 				booleanQZSS=false;//и сюда больше не попадаем, в случае нахождения ещё "QZSS"
 				strArray.add("QZSS");
 			}
-			
+
 			if(booleanSBAS&&(s.getConstellationType().equals("SBAS"))){
 				mInt++;//инкрименируем
 				booleanSBAS=false;//и сюда больше не попадаем, в случае нахождения ещё "SBAS"
 				strArray.add("SBAS");
 			}
-			
+
 			if(booleanUNKNOWN&&(s.getConstellationType().equals("UNKNOWN"))){
 				mInt++;//инкрименируем
 				booleanUNKNOWN=false;//и сюда больше не попадаем, в случае нахождения ещё "UNKNOWN"
 				strArray.add("UNKNOWN");
 			}
-			
+
 		}//цикл
-		
-		
+
+
 		//закончился цикл, mInt инициализирована нужным числом
 		//инкрименируем её ещё на 1 (все видимые устройством спутники)
 		mInt++;
 		strArray.add("ALL");//кладём несуществующий в myBooleanArray ключ 
-		
-		
-		
+
+
+
 		str=new String[mInt];//распределяем память массива
-		
+
 		//заполняем массив
 		for(String s:strArray){
 			str[count1]=s;
 			count1++;
 		}
-		
-		
-		
-	    
+
+
+
+
 		//все в массив положим false
 		boolean b=false;
 		skyView. myBooleanArray.put("BEIDOU",b);
@@ -1110,13 +1283,13 @@ break;
 		skyView. myBooleanArray.put("UNKNOWN",b);
 		//и единственную:
 		if(skyView. myBooleanArray.containsKey(str[j])){//если содержит ключ
-		skyView. myBooleanArray.put(str[j],true);//инициализируем true
-		
+			skyView. myBooleanArray.put(str[j],true);//инициализируем true
+
 			skyTextView.setTextColor(Color.parseColor("#808080"));
 			skyTextView.setText("Показывать только спутники "+str[j]);
 			skyTextView.postDelayed(myActionSky,70);
-			
-		
+
+
 		}else{//если несуществющий ключ:
 			b=true;
 			skyView. myBooleanArray.put("BEIDOU",b);
@@ -1127,28 +1300,28 @@ break;
 			skyView. myBooleanArray.put("QZSS",b);
 			skyView. myBooleanArray.put("SBAS",b);
 			skyView. myBooleanArray.put("UNKNOWN",b);
-			
+
 			skyTextView.setTextColor(Color.parseColor("#808080"));
 			skyTextView.setText("Показывать все видимые устройством спутники");
 			skyTextView.postDelayed(myActionSky,70);
-			
+
 		}
-		
-		
-			
-		
-				
-		
-		
-			
-			if(j<(mInt-1)){j++;}else{j=0;}
-		
-			//Toaster.toast( "mInt="+mInt+"\n"+
-			               //"j="+j);
-		
-			
-		
-		
+
+
+
+
+
+
+
+
+		if(j<(mInt-1)){j++;}else{j=0;}
+
+		//Toaster.toast( "mInt="+mInt+"\n"+
+		//"j="+j);
+
+
+
+
 		mInt=0;
 		count1=0;
 		strArray=null;
@@ -1160,22 +1333,22 @@ break;
 		booleanQZSS=true;
 		booleanSBAS=true;
 		booleanUNKNOWN=true;
-		
-		
-		
-			
-			
-			
-	
+
+
+
+
+
+
+
 
 
 		skyView.invalidate();
 		vibracia();
 	}
-	
-	
-	
-	
+
+
+
+
 
 
 	//при листании пейджера нужно находить элементы
@@ -1231,15 +1404,15 @@ break;
 	}
 
 
-	
-	
-	
-	
-	
-	
-	
-	
-	
+
+
+
+
+
+
+
+
+
 	//Используется в satelliteSort.postDelayed(myAction,30);
 	//здесь логика такая: изначально цвет текста textView красный,
 	//а через 30 мс он становится "навсегда" #BDBDBD,
@@ -1257,7 +1430,7 @@ break;
 
 	};
 	//метод ниже это oncl, назначен заголовочному лайауту (id=satelliteHeaderLinearLayout1) во второй стр
-	public void satelliteHeaderLayoutOncl(View v){
+	public void satelliteHeaderLayoutOncl(){
 
 		vibracia();
 
@@ -1361,92 +1534,94 @@ break;
 
 
 	}
-	
-	
-	
-	
-	
-	
-	
-	
-	
+
+
+
+
+
+
+
+
+
 
 	//Listener viewPager2 
 	ViewPager2.OnPageChangeCallback onPageChangeCallback = new ViewPager2.OnPageChangeCallback() {//Listener viewPager2 onPageChangeCallback
-		
-	@Override
-	public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
-		super.onPageScrolled(position, positionOffset, positionOffsetPixels);
-	}
 
-	@Override
-	public void onPageSelected(int position)
-	{
-		// TODO: Implement this method
-		super.onPageSelected(position);
-		page=position;//делаем видимой переменную для других методов 
-		findView();//находим элементы разметок
-		
-		
-		//обновление view представлений страниц пейджера, приходится делать здесь, где Listener пейджера (это связано с findView())
-		if(page==0){//если первая стр
-		
-		
-		    //чекаем чекбоксы:
-			checkBox1.setChecked(checkBoxBooleanTone);
-			checkBox1.setOnCheckedChangeListener(onch);
-			
-			checkBox2.setChecked(checkBoxBooleanVoice);
-			checkBox2.setOnCheckedChangeListener(onch);
-			
-		
-		 //подпишем текст рядом с кнопкой "Настройки", в зависимости от того вкл или выкл локация
-		 if(provider.equals("")){//если в настройках системы выключено определение местоположения
-
-		 //бегущий текст
-		 strSetting="Локация выключена в настройках системы"+"\n";
-		 textViewSetting.setText(strSetting);
-		 textViewSetting.setSelected(true);
-		 textViewSetting.setSingleLine(true);
-		 textViewSetting.setTextColor(Color.parseColor("#FF4908"));
-		 textViewSetting.setShadowLayer(3,3,3,Color.parseColor("#141414"));
-		 textViewSetting.setEllipsize(TruncateAt.MARQUEE);
-		 buttonSetting.setText("Включить");
-
-
-		 }else{//если в настройках системы наоборот, включено определение местоположения
-
-		 //обычный текст 
-		 strSetting="Доступные провайдеры: " + provider+"\n";
-		 textViewSetting.setText(strSetting);
-		 textViewSetting.setTextColor(Color.parseColor("#FF5722"));
-		 textViewSetting.setShadowLayer(2,2,2,Color.parseColor("#141414"));
-		 textViewSetting.setSingleLine(false);
-		 textViewSetting.setEllipsize(null);
-		 buttonSetting.setText("Настройки");
-
-		 }//подпишем текст рядом с кнопкой "Настройки", в зависимости от того вкл или выкл локация
-		}//если первая стр
-		
-		
-		if(page==1){
-			satelliteHeaderLinearLayout.setBackgroundDrawable(getDrawable(R.drawable.states_shapes_header));
-			listView.setOnItemClickListener(onitecl);
+		@Override
+		public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+			super.onPageScrolled(position, positionOffset, positionOffsetPixels);
 		}
-		
-		
-		
-		
-		
-		
-	}
-	
-	
-	
-	};//закрылся анонимный класс //Listener viewPager2 onPageChangeCallback
-	
 
-	
+		@Override
+		public void onPageSelected(int position)
+		{
+			// TODO: Implement this method
+			super.onPageSelected(position);
+			page=position;//делаем видимой переменную для других методов 
+			findView();//находим элементы разметок
+
+
+			//обновление view представлений страниц пейджера, приходится делать здесь, где Listener пейджера (это связано с findView())
+			if(page==0){//если первая стр
+
+
+				//чекаем чекбоксы:
+				checkBox1.setChecked(checkBoxBooleanTone);
+				checkBox1.setOnCheckedChangeListener(onch);
+
+				checkBox2.setChecked(checkBoxBooleanVoice);
+				checkBox2.setOnCheckedChangeListener(onch);
+
+
+				//подпишем текст рядом с кнопкой "Настройки", в зависимости от того вкл или выкл локация
+				if(provider.equals("")){//если в настройках системы выключено определение местоположения
+
+					//бегущий текст
+					strSetting="Локация выключена в настройках системы"+"\n";
+					textViewSetting.setText(strSetting);
+					textViewSetting.setSelected(true);
+					textViewSetting.setSingleLine(true);
+					textViewSetting.setTextColor(Color.parseColor("#FF4908"));
+					textViewSetting.setShadowLayer(3,3,3,Color.parseColor("#141414"));
+					textViewSetting.setEllipsize(TruncateAt.MARQUEE);
+					buttonSetting.setText("Включить");
+
+
+				}else{//если в настройках системы наоборот, включено определение местоположения
+
+					//обычный текст 
+					strSetting="Доступные провайдеры: " + provider+"\n";
+					textViewSetting.setText(strSetting);
+					textViewSetting.setTextColor(Color.parseColor("#FF5722"));
+					textViewSetting.setShadowLayer(2,2,2,Color.parseColor("#141414"));
+					textViewSetting.setSingleLine(false);
+					textViewSetting.setEllipsize(null);
+					buttonSetting.setText("Настройки");
+
+				}//подпишем текст рядом с кнопкой "Настройки", в зависимости от того вкл или выкл локация
+			}//если первая стр
+
+
+			if(page==1){
+				satelliteHeaderLinearLayout.setBackgroundDrawable(getDrawable(R.drawable.states_shapes_header));
+				listView.setOnItemClickListener(onitecl);
+				satelliteHeaderLinearLayout.setOnLongClickListener(onlong);
+				satelliteHeaderLinearLayout.setOnTouchListener(onTouch);
+			}
+
+
+
+
+
+
+		}
+
+
+
+	};//закрылся анонимный класс //Listener viewPager2 onPageChangeCallback
+
+
+
 	OnItemClickListener onitecl=new OnItemClickListener(){
 
 		View convertView;
@@ -1542,13 +1717,68 @@ break;
 
 		};
 	};
+
+
+
+
+	
+	
+	
+	public void myOnclLayout(long result){
+
+		if(result<500){//if(resultTime<800)
+			satelliteHeaderLayoutOncl();
+			//vibracia();
+			//textView.setText("resultTime<800");
+			//Toaster.toast("myOnclLayout");
+		}//if(resultTime<800)
+	}
+
+	//связан с методом выше
+	OnTouchListener onTouch= new OnTouchListener(){
+
+		@Override
+		public boolean onTouch(View p1, MotionEvent event)
+		{
+
+			switch (event.getAction()){
+
+				case MotionEvent.ACTION_DOWN:
+					startTime=System.currentTimeMillis();
+					break;
+
+				case MotionEvent.ACTION_UP:
+					endTime=System.currentTimeMillis();
+                    resultTime=endTime-startTime;
+					myOnclLayout(resultTime);
+					break;
+			}
+
+			return false;//возвращаем false иначе не дойдёт в OnLongClickListener
+		}
+	};
+
+
+	OnLongClickListener onlong = new OnLongClickListener(){
+
+		@Override
+		public boolean onLongClick(View p1)
+		{
+
+			//textView.setText("onLongClick");
+			showDialog(3);
+			vibracia();
+			return true;
+		}
+	};
 	
 	
 	
 
 	
-	
-	
+
+
+
 	public synchronized void mysort(){
 		if(page==1){//если вторая стр
 
@@ -1615,7 +1845,16 @@ break;
 			//сортируем полученные экзепляры класса (на помощь нам приходит реализованный в классе MySatellite компаратор):
 
 
+			array=null;
+			array=new ArrayList();
+			//переберем заполненный arrayList со спутниками
+			for(MySatellite m:arraySat){
 
+				//в зависимости от чекнутых чекбоксов
+				if((boolean)myBooleanArray.get( m.getConstellationType() )){//1
+					array.add(m);//заполняем массив для адаптера
+				}//1
+			}
 
 
 			/*
@@ -1623,7 +1862,7 @@ break;
 			 sat=new String[size];
 			 */
 			//подготавливаем данные для адаптера
-			int size=arraySat.size();
+			int size=array.size();
 
 			usedInFix=null;
 			svid=null;
@@ -1641,7 +1880,7 @@ break;
 			azimuth=new float[size];
 
 			//теперь, после сортировки arraylist, цикл for-each:
-			for(MySatellite mySat:arraySat){//начался цикл
+			for(MySatellite mySat:array){//начался цикл
 
 
 
@@ -1743,7 +1982,7 @@ break;
 
 		}//если вторая стр
 	}
-	
+
 
 
 	public int getIntImageRes(String constellationType){
@@ -1789,7 +2028,7 @@ break;
 		return image;
 	}
 
-	
+
 
 
 
@@ -1797,17 +2036,17 @@ break;
 	public class MyRun implements Runnable
 	{
 
-		
+
 		private Thread t;
 
 		//это ещё основной поток
-		
+
 		@Override
 		public void run()
 		{
 
 			//а здесь уже дочерний
-			
+
 			t=Thread.currentThread();
 
 			while(!t.isInterrupted()){
@@ -1838,30 +2077,30 @@ break;
 
 
 	public Notification getNotification(){
-		
-		Notification notification;
-		
-		
-		
-		
-		
-		
-		if(!provider.equals("")){
-		
-		// Create Notification
-		//Используем билдер, в котором указываем иконку, 
-		//заголовок и текст для уведомления. 
-		NotificationCompat.Builder builder =
-			new NotificationCompat.Builder(this,CHANNEL_ID)
-			.setSmallIcon(R.drawable.truiton_short)
-			.setContentText(MainActivity.countUsedFix!=0?"Точность: "  +(int)(double)LocationData.accuracyGPS+" метров    " +"«GPS  " +"("+MainActivity.countUsedFix+"\\"+MainActivity.count+")»"  :  "Ожидание связи с  «GPS  " +"("+MainActivity.countUsedFix+"\\"+MainActivity.count+")»")
-			//.setUsesChronometer(true)
-			.setContentIntent(resultPendingIntent)//вот интент в активити
-			//.setContentTitle("Foreground Service")
-			.setColor(Color.parseColor("#ff4f00"));
 
-        //Методом build получаем готовое уведомление.
-		notification = builder.build();
+		Notification notification;
+
+
+
+
+
+
+		if(!provider.equals("")){
+
+			// Create Notification
+			//Используем билдер, в котором указываем иконку, 
+			//заголовок и текст для уведомления. 
+			NotificationCompat.Builder builder =
+				new NotificationCompat.Builder(this,CHANNEL_ID)
+				.setSmallIcon(R.drawable.truiton_short)
+				.setContentText(MainActivity.countUsedFix!=0?"Точность: "  +(int)(double)LocationData.accuracyGPS+" метров    " +"«GPS  " +"("+MainActivity.countUsedFix+"\\"+MainActivity.count+")»"  :  "Ожидание связи с  «GPS  " +"("+MainActivity.countUsedFix+"\\"+MainActivity.count+")»")
+				//.setUsesChronometer(true)
+				.setContentIntent(resultPendingIntent)//вот интент в активити
+				//.setContentTitle("Foreground Service")
+				.setColor(Color.parseColor("#ff4f00"));
+
+			//Методом build получаем готовое уведомление.
+			notification = builder.build();
 
 		}else{//провайде блокирован
 			// Create Notification
@@ -1878,11 +2117,11 @@ break;
 
 			//Методом build получаем готовое уведомление.
 			notification = builder.build();
-			
+
 		}
-		
-		
-		
+
+
+
 		return notification;
 	}
 
@@ -1946,7 +2185,7 @@ break;
 				//и таким образом выясним среднее значение "условия приёма"
 				//затем будем использовать при синтезе речи - плохие условия приёма/хорошие условия приёма
 				summCn0DbHz=summCn0DbHz+mySatellite.getCn0DbHz();
-				
+
 				//но для правильной математической операции нужно выяснить
 				//количество спутников без тех, у которых getBasebandCn0DbHz=0
 				//иначе мы неправильно найдём среднее арифметическое
@@ -1966,10 +2205,10 @@ break;
 			//плотностей отношения несущей к шуму основной полосы частот спутников,
 			//(используется в звуковом уведомление "условия приёма")
 			if((count-countNO_DATA)!=0){
-			averageCn0DbHz=summCn0DbHz/(count-countNO_DATA);//делим суммарное значение плотностей на эту разность
+				averageCn0DbHz=summCn0DbHz/(count-countNO_DATA);//делим суммарное значение плотностей на эту разность
 			}
-			
-			
+
+
 
 
 
@@ -2005,7 +2244,7 @@ break;
 
 
 
-			
+
 
 			if(page==0){//если сейчас отображается первая страница
 				viewCountSat.invalidate();//кол-спутников
@@ -2018,20 +2257,20 @@ break;
 				mysort();//сортируем список на второй странице
 			}//если сейчас отображается вторая страница
 
-			
+
 			if(page==2){//если сейчас отображается третья страница
 				skyView.invalidate();//обновляем небосвод
 				viewCountSatSky.invalidate();//подпишем под небосводом
 				barGraphSkyCn0DbHz.invalidate();//гистограмма плотность отношения несущей к шуму на антенне 
 				barGraphSkyBasebandCn0DbHz.invalidate();//гистограмма плотность отношения несущей к шуму основной полосы
 			}///если сейчас отображается третья страница
-			
 
 
-			
-			
-			
-		
+
+
+
+
+
 
 
 			//эта замысловатая конструкция с boolean переменными a и b,
@@ -2067,12 +2306,12 @@ break;
 
 
 
-			
 
 
 
 
-               if(page==1){//если вторая стр
+
+			if(page==1){//если вторая стр
 
 
 				progressBar.setVisibility(View.INVISIBLE);
@@ -2082,27 +2321,27 @@ break;
 				//satellitelistTextViewUse.setText(Html.fromHtml(getUseSatelliteStr(countUsedFix)));
 
 
-				
-				
-				
-				
-			
+
+
+
+
+
 				if(countUsedFix==0){//если ни один спутник не используется для определения
 					//снимаем gravity - параметр
 					satellitelistTextViewUse.setGravity(Gravity.NO_GRAVITY);
 					//затем
-					   //посчитаем ширину текста строки "Ожидаю расчёт фиксации положения.", и сделаем так, чтобы текст расположился по центру
-					   String string="Ожидаю расчёт фиксации положения";
-					   Paint textPaint = satellitelistTextViewUse.getPaint();
-					   float widthText = textPaint.measureText(string);
-					   int widthTextView=satellitelistTextViewUse.getWidth();
-					   int result=(int)((widthTextView-widthText)/2);//величина отступа
-					   satellitelistTextViewUse.setPadding(result,3,3,3);
-					   
+					//посчитаем ширину текста строки "Ожидаю расчёт фиксации положения.", и сделаем так, чтобы текст расположился по центру
+					String string="Ожидаю расчёт фиксации положения";
+					Paint textPaint = satellitelistTextViewUse.getPaint();
+					float widthText = textPaint.measureText(string);
+					int widthTextView=satellitelistTextViewUse.getWidth();
+					int result=(int)((widthTextView-widthText)/2);//величина отступа
+					satellitelistTextViewUse.setPadding(result,3,3,3);
+
 
 					i++;
 
-					
+
 					switch (i){
 
 
@@ -2137,20 +2376,20 @@ break;
 			}//если вторая стр
 
 
-			
-			
-			
-			
-			
+
+
+
+
+
 			mNotificationManager.notify(NOTIFY_ID, getNotification());
-			
-			
-			
+
+
+
 			//тональник при фиксе
 			if(checkBoxBooleanTone&(countUsedFix!=0)){
 				tone.tone();
 			}
-			
+
 
             //не забыть их обнулять, а то они насуммируются
 			summCn0DbHz=0;
@@ -2165,7 +2404,7 @@ break;
 
 
 
-        
+
 		//заголовок второй стр
 		//этот метод (getSortText), нужен в классе там где выполняется:
 		//satelliteSort.setText(getSortText(sort));
@@ -2175,61 +2414,61 @@ break;
 			//изначально инициализирована public int sort=3;
 			switch(sort){//выполняем различные сортировки листа со списком спутников
 
-			
+
 				case 0:
 					str="Отсортировано: используются в определении";
 					break;
-			
-			
+
+
 				case 1:
 					str= "Отсортировано по группам";
 					break;
 
-					
+
 				case 2:
 					str="Отсортировано по несущей частоте";
 					break;
-					
-					
+
+
 				case 3:
 					str="Отсортировано: ОНШП";
 					break;
-					
-					
+
+
 				case 4:
 					str="Отсортировано: угол возвышения";
 					break;
-					
+
 				case 5:
 					str="Отсортировано по азимуту";
 					break;
 
-				
 
-				
-                /*
-				case 4:
-					str="Сортировать по Svid";
-					break;
 
-			
-				case 7:
-					str="Сортировать: ОНША";
-					break;
 
-				case 8:
-					str="Сортировать по наличию альманаха";
-					break;
+					/*
+					 case 4:
+					 str="Сортировать по Svid";
+					 break;
 
-				case 9:
-					str="Сортировать по наличию эфемеридных данных";
-					break;
-                    */
-					
+
+					 case 7:
+					 str="Сортировать: ОНША";
+					 break;
+
+					 case 8:
+					 str="Сортировать по наличию альманаха";
+					 break;
+
+					 case 9:
+					 str="Сортировать по наличию эфемеридных данных";
+					 break;
+					 */
+
 			}
 			return str;
 		}//закрылся метод getSortText
-        
+
 
 
         //заголовок второй стр
