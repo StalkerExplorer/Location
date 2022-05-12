@@ -12,7 +12,7 @@
 		android:background="#FF222222"
 		android:id="@+id/satelliteHeaderLinearLayout1"
 		android:layout_gravity="center"
-		android:onClick="satelliteHeaderLayoutOncl">
+		>
 
 		<TextView
 			android:layout_width="match_parent"
@@ -194,4 +194,3 @@
 	
 
 </LinearLayout>
-
