@@ -8,4 +8,21 @@
 		<item name="android:colorBackground">#252525</item>
 		<item name="colorControlActivated">@android:color/holo_orange_dark</item>
 	</style>
+	
+	
+	<style name="MySwitch" parent="Theme.AppCompat.Light">
+		<!-- активное состояние (30% прозрачности для фона) -->
+		<item name="colorControlActivated">#455A64</item>
+
+		
+		<!-- цвет дорожки для неактивного состояния (30% прозрачности) -->
+		<item name="android:colorForeground">@android:color/darker_gray</item>
+	</style>
+	
+	<!--MyDialogTheme-->
+	<style name="MyDialogTheme" parent="Theme.AppCompat.Light.Dialog"> 
+		<item name="android:padding">5dp</item>
+	</style> 
+	
+	
 </resources>
