@@ -759,13 +759,14 @@ public class MainActivity extends Activity implements SharedConstants
 		if((!provider.equals(""))){//если GPS включен
 			//запускаем сервис
 			// используем явный вызов службы
-			startForegroundService(
-				new Intent(MainActivity.this, MyService.class));
+               startForegroundService(
+                   new Intent(MainActivity.this, MyService.class));
             ////В сервисе мы получаем сведения о последнем известном местоположении
 			//при этом смотрим двух провайдеров. И инициализируем из сервиса переменные класса LocationData
 
-			MainActivity. mLocationManager.registerGnssStatusCallback(gnssStatusCallback);
-			viewPager.setUserInputEnabled(true);//делаем доступным скроллирование страниц viewPager2
+			    worker=new MyRun();//класс связан с звуковым уведомлением
+                MainActivity. mLocationManager.registerGnssStatusCallback(gnssStatusCallback);
+               viewPager.setUserInputEnabled(true);//делаем доступным скроллирование страниц viewPager2
 		}//если GPS включен
 		else{//иначе GPS выключен
 			viewPager.setUserInputEnabled(false);//блокируем скроллирование страниц viewPager2
@@ -793,8 +794,7 @@ public class MainActivity extends Activity implements SharedConstants
 		createNotificationChannel1();//каналы, - при внесении изменений в ходе разработки требуется переустановка, 
 		createNotificationChannel2();//чтобы изменения вступали в силу
 		//каналы для уведомлений//
-		worker=new MyRun();//класс связан с звуковым уведомлением
-
+		
 		//уведомление в строке состояния:
 		//mNotificationManager.notify(NOTIFY_ID, getNotification());
 
