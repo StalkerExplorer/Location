@@ -1,0 +1,202 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+	xmlns:android="http://schemas.android.com/apk/res/android"
+	android:layout_width="fill_parent"
+	android:layout_height="fill_parent"
+	android:orientation="vertical">
+
+	<LinearLayout
+		android:orientation="vertical"
+		android:layout_width="match_parent"
+		android:layout_height="match_parent"
+		android:layout_gravity="center"
+		android:gravity="center"
+		android:layout_weight="1.0">
+
+		<LinearLayout
+			android:orientation="horizontal"
+			android:layout_width="230dp"
+			android:layout_height="wrap_content"
+			android:gravity="left|center"
+			android:layout_margin="3dp">
+
+			<CheckBox
+				android:layout_width="230dp"
+				android:layout_height="wrap_content"
+				android:layout_gravity="center"
+				android:textColor="#FF4908"
+				android:textSize="12sp"
+				android:layout_marginLeft="10dp"
+				android:layout_marginRight="5dp"
+				android:theme="@style/MySwitch"
+				android:id="@+id/checkBoxGPS"
+				android:text="GPS (США Navstar)"
+				android:singleLine="true"
+				android:padding="10dp"/>
+
+		</LinearLayout>
+
+		<LinearLayout
+			android:orientation="horizontal"
+			android:layout_width="230dp"
+			android:layout_height="wrap_content"
+			android:gravity="left|center"
+			android:layout_margin="3dp">
+
+			<CheckBox
+				android:layout_width="230dp"
+				android:layout_height="wrap_content"
+				android:layout_gravity="center"
+				android:textColor="#FF4908"
+				android:textSize="12sp"
+				android:layout_marginLeft="10dp"
+				android:layout_marginRight="5dp"
+				android:theme="@style/MySwitch"
+				android:id="@+id/checkBoxGLONASS"
+				android:text="ГЛОНАСС (Россия)"
+				android:singleLine="true"
+				android:padding="10dp"/>
+
+		</LinearLayout>
+
+		<LinearLayout
+			android:orientation="horizontal"
+			android:layout_width="230dp"
+			android:layout_height="wrap_content"
+			android:gravity="left|center"
+			android:layout_margin="3dp">
+
+			<CheckBox
+				android:layout_width="230dp"
+				android:layout_height="wrap_content"
+				android:layout_gravity="left|center"
+				android:textColor="#FF4908"
+				android:textSize="12sp"
+				android:layout_marginLeft="10dp"
+				android:layout_marginRight="5dp"
+				android:theme="@style/MySwitch"
+				android:id="@+id/checkBoxGALILEO"
+				android:text="GALILEO (Европейский союз)"
+				android:singleLine="true"
+				android:padding="10dp"/>
+
+		</LinearLayout>
+
+		<LinearLayout
+			android:orientation="horizontal"
+			android:layout_width="230dp"
+			android:layout_height="wrap_content"
+			android:gravity="left|center"
+			android:layout_margin="3dp">
+
+			<CheckBox
+				android:layout_width="230dp"
+				android:layout_height="wrap_content"
+				android:layout_gravity="center"
+				android:textColor="#FF4908"
+				android:textSize="12sp"
+				android:layout_marginLeft="10dp"
+				android:layout_marginRight="5dp"
+				android:theme="@style/MySwitch"
+				android:id="@+id/checkBoxBEIDOU"
+				android:text="BEIDOU COMPASS (Китай)"
+				android:singleLine="true"
+				android:padding="10dp"/>
+
+		</LinearLayout>
+
+		<LinearLayout
+			android:orientation="horizontal"
+			android:layout_width="230dp"
+			android:layout_height="wrap_content"
+			android:gravity="left|center"
+			android:layout_margin="3dp">
+
+			<CheckBox
+				android:layout_width="230dp"
+				android:layout_height="wrap_content"
+				android:layout_gravity="center"
+				android:textColor="#FF4908"
+				android:textSize="12sp"
+				android:layout_marginLeft="10dp"
+				android:layout_marginRight="5dp"
+				android:theme="@style/MySwitch"
+				android:id="@+id/checkBoxQZSS"
+				android:text="QZSS (Япония)"
+				android:singleLine="true"
+				android:padding="10dp"/>
+
+		</LinearLayout>
+
+		<LinearLayout
+			android:orientation="horizontal"
+			android:layout_width="230dp"
+			android:layout_height="wrap_content"
+			android:gravity="left|center"
+			android:layout_margin="3dp">
+
+			<CheckBox
+				android:layout_width="230dp"
+				android:layout_height="wrap_content"
+				android:layout_gravity="center"
+				android:textColor="#FF4908"
+				android:textSize="12sp"
+				android:layout_marginLeft="10dp"
+				android:layout_marginRight="5dp"
+				android:theme="@style/MySwitch"
+				android:id="@+id/checkBoxSBAS"
+				android:text="SBAS"
+				android:singleLine="true"
+				android:padding="10dp"/>
+
+		</LinearLayout>
+
+		<LinearLayout
+			android:orientation="horizontal"
+			android:layout_width="230dp"
+			android:layout_height="wrap_content"
+			android:gravity="left|center"
+			android:layout_margin="3dp">
+
+			<CheckBox
+				android:layout_width="230dp"
+				android:layout_height="wrap_content"
+				android:layout_gravity="center"
+				android:textColor="#FF4908"
+				android:textSize="12sp"
+				android:layout_marginLeft="10dp"
+				android:layout_marginRight="5dp"
+				android:theme="@style/MySwitch"
+				android:id="@+id/checkBoxIRNSS"
+				android:text="IRNSS (Индия)"
+				android:singleLine="true"
+				android:padding="10dp"/>
+
+		</LinearLayout>
+
+		<LinearLayout
+			android:orientation="horizontal"
+			android:layout_width="230dp"
+			android:layout_height="wrap_content"
+			android:gravity="left|center"
+			android:layout_margin="3dp">
+
+			<CheckBox
+				android:layout_width="230dp"
+				android:layout_height="wrap_content"
+				android:layout_gravity="center"
+				android:textColor="#FF4908"
+				android:textSize="12sp"
+				android:layout_marginLeft="10dp"
+				android:layout_marginRight="5dp"
+				android:theme="@style/MySwitch"
+				android:id="@+id/checkBoxUNKNOWN"
+				android:text="НЕИЗВЕСТНО"
+				android:singleLine="true"
+				android:padding="10dp"/>
+
+		</LinearLayout>
+
+	</LinearLayout>
+
+</LinearLayout>
