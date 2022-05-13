@@ -16,19 +16,22 @@ import android.text.TextUtils.*;
 import android.view.*;
 import android.view.View.*;
 import android.widget.*;
+import android.widget.AdapterView.*;
+import android.widget.CompoundButton.*;
 import android.widget.LinearLayout.*;
 import androidx.core.app.*;
 import androidx.core.content.*;
 import androidx.viewpager2.widget.*;
 import com.software1004developer.gps.*;
 import com.software1004developer.gps.view.*;
+import java.nio.channels.*;
 import java.util.*;
 import java.util.concurrent.*;
 
-
 import android.view.View.OnClickListener;
-import android.widget.CompoundButton.*;
-import android.widget.AdapterView.*;
+import android.view.View.OnLongClickListener;
+import android.view.View.OnTouchListener;
+import android.widget.LinearLayout.LayoutParams;
 
 public class MainActivity extends Activity implements SharedConstants
 {
@@ -597,13 +600,18 @@ public class MainActivity extends Activity implements SharedConstants
 
 
 
-
+                
 				//текст рядом с кнопкой "Настройки"
 				if(provider.equals("")){//если в настройках системы выключено определение местоположения
 
 
+				    
+					//mLocationManager.unregisterGnssStatusCallback(gnssStatusCallback);
+				
+				
 					viewPager.setUserInputEnabled(false);//блокируем скроллирование страниц viewPager2
 
+					
 					//бегущий текст
 					strSetting="Локация выключена в настройках системы"+"\n";
 					textViewSetting.setText(strSetting);
@@ -613,12 +621,15 @@ public class MainActivity extends Activity implements SharedConstants
 					textViewSetting.setShadowLayer(3,3,3,Color.parseColor("#141414"));
 					textViewSetting.setEllipsize(TruncateAt.MARQUEE);
 					buttonSetting.setText("Включить");
-
+                    
+					
 
 				}else{//если в настройках системы наоборот, включено определение местоположения
 
+				
 					viewPager.setUserInputEnabled(true);//делаем доступным скроллирование страниц viewPager2
 
+					
 					//обычный текст 
 					strSetting="Доступные провайдеры: " + provider+"\n";
 					textViewSetting.setText(strSetting);
@@ -627,7 +638,7 @@ public class MainActivity extends Activity implements SharedConstants
 					textViewSetting.setSingleLine(false);
 					textViewSetting.setEllipsize(null);
 					buttonSetting.setText("Настройки");
-
+                    
 
 
 
@@ -639,7 +650,8 @@ public class MainActivity extends Activity implements SharedConstants
 					////В сервисе мы получаем сведения о последнем известном местоположении
 					//при этом смотрим двух провайдеров. И инициализируем из сервиса переменные класса LocationData
 
-					MainActivity. mLocationManager.registerGnssStatusCallback(gnssStatusCallback);
+					
+		            MainActivity. mLocationManager.registerGnssStatusCallback(gnssStatusCallback);
 					//уведомление в строке состояния:
 					mNotificationManager.notify(NOTIFY_ID, getNotification());
 				}
@@ -727,19 +739,6 @@ public class MainActivity extends Activity implements SharedConstants
 
 		//Проверим "Локацию" в настройках системы. Вкл/Выкл
 		provider = Settings.Secure.getString(getContentResolver(), Settings.Secure.LOCATION_PROVIDERS_ALLOWED);
-
-		
-		/*
-		boolean b=true;
-		myBooleanArray.put("BEIDOU",b);
-		myBooleanArray.put("GALILEO",b);
-		myBooleanArray.put("GLONASS",b);
-		myBooleanArray.put("GPS",b);
-		myBooleanArray.put("IRNSS",b);
-		myBooleanArray.put("QZSS",b);
-		myBooleanArray.put("SBAS",b);
-		myBooleanArray.put("UNKNOWN",b);
-		*/
 		
 		//экземпляр класса с тональником (в нем метод, где есть звук "beep-beep" во время фиксации позиции)
 		tone=new Tone(ToneGenerator.TONE_PROP_BEEP,300);
@@ -755,26 +754,7 @@ public class MainActivity extends Activity implements SharedConstants
         mLocationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
 		gnssStatusCallback=new GnssStatusCallback();
 
-
-		if((!provider.equals(""))){//если GPS включен
-			//запускаем сервис
-			// используем явный вызов службы
-               startForegroundService(
-                   new Intent(MainActivity.this, MyService.class));
-            ////В сервисе мы получаем сведения о последнем известном местоположении
-			//при этом смотрим двух провайдеров. И инициализируем из сервиса переменные класса LocationData
-
-			    worker=new MyRun();//класс связан с звуковым уведомлением
-                MainActivity. mLocationManager.registerGnssStatusCallback(gnssStatusCallback);
-               viewPager.setUserInputEnabled(true);//делаем доступным скроллирование страниц viewPager2
-		}//если GPS включен
-		else{//иначе GPS выключен
-			viewPager.setUserInputEnabled(false);//блокируем скроллирование страниц viewPager2
-		}
-
-
-
-
+		
 		//каналы для уведомлений//
 		//перед созданием каналов
 		//получаем notificationManager:
@@ -794,7 +774,7 @@ public class MainActivity extends Activity implements SharedConstants
 		createNotificationChannel1();//каналы, - при внесении изменений в ходе разработки требуется переустановка, 
 		createNotificationChannel2();//чтобы изменения вступали в силу
 		//каналы для уведомлений//
-		
+
 		//уведомление в строке состояния:
 		//mNotificationManager.notify(NOTIFY_ID, getNotification());
 
@@ -807,7 +787,32 @@ public class MainActivity extends Activity implements SharedConstants
 		if(mSettings.contains("checkBoxBooleanVoice")){
 			checkBoxBooleanTone=mSettings.getBoolean("checkBoxBooleanVoice",true);
 		}
+		
+		
+		
+		
+		worker=new MyRun();//класс связан с звуковым уведомлением
 
+		if((!provider.equals(""))){//если GPS включен
+			//запускаем сервис
+			// используем явный вызов службы
+               startForegroundService(
+                   new Intent(MainActivity.this, MyService.class));
+            ////В сервисе мы получаем сведения о последнем известном местоположении
+			//при этом смотрим двух провайдеров. И инициализируем из сервиса переменные класса LocationData
+
+			    
+                MainActivity. mLocationManager.registerGnssStatusCallback(gnssStatusCallback);
+               viewPager.setUserInputEnabled(true);//делаем доступным скроллирование страниц viewPager2
+		}//если GPS включен
+		else{//иначе GPS выключен
+			viewPager.setUserInputEnabled(false);//блокируем скроллирование страниц viewPager2
+		}
+
+
+
+
+		
 
 	}//metod2//если успешно прошли privacy_policy
 
@@ -928,42 +933,34 @@ public class MainActivity extends Activity implements SharedConstants
 	@Override
 	protected void onDestroy()
 	{
-		// TODO: Implement this method
-		//в определенных случаях мы дважды проходим finish() (это может вызвать сбой)
+	
 		if(mSettings.getBoolean(PRIVAC_POLIC, false)){//если успешно прошли privacy_policy, //то у нас уже запущено много всего
 			if(hasPermission()){//но запущено в случае наличия разрешений на местоположение
 
-
-//if(!provider.equals("")){//если GPS включен
 				//уничтожаем сервис:
 				stopService(
 					new Intent(MainActivity.this, MyService.class));
 
 				MainActivity. mLocationManager.unregisterGnssStatusCallback(gnssStatusCallback);
 
-
+				
 				//playNotification.stop();//уведомление "плохие условия приема"
-				if(worker.t!=null){//
-					//worker.t!=null если хоть раз выполнялся код в run()
-					//хоть раз выполнится код в run(), в случае: executor.execute(worker);
-					worker.t.interrupt();
+				if(worker!=null&&  worker.t!=null){//worker.t!=null если хоть раз выполнится код в run()
+				//хоть раз выполнится код в run(), в случае: executor.execute(worker);
+						worker.t.interrupt();//примечание: сбой раньше был потому что worker==null
 				}
 
 				executor.shutdownNow();// После этого исполнитель перестанет принимать какие-либо новые потоки и завершит все существующие в очереди 
-//}////если GPS включен
-
-				//Toaster.toast("finish()  " +myCount);
-
-
-				super.finish();
+              
+				
 			}//но запущено в случае наличия разрешений на местоположение
 		}//если успешно прошли privacy_policy
 		else{//иначе мы ещё не прошли privacy_policy
-			//Toaster.toast("finish()  "+myCount);
-			super.finish();//просто закрываем программу, не останавливаем никакие сервисы как выше в коде
+			//Toast.makeText(mContext, "super.onDestroy();", Toast.LENGTH_LONG).show();
 		}
 
 		super.onDestroy();
+		//Toast.makeText(mContext, "super.onDestroy();", Toast.LENGTH_LONG).show();
 	}
 
 
@@ -990,8 +987,6 @@ public class MainActivity extends Activity implements SharedConstants
 			}
 		}
 	};
-
-
 
 
 
@@ -1894,22 +1889,7 @@ public class MainActivity extends Activity implements SharedConstants
 				//отдельно инициализируем булев массив (используется в адаптере (метод getView()))
                 usedInFix[mysortI]=mySat.getUsedInFix();
 
-				/*
-				 sat[mysortI]=
-				 "Идентификационный номер спутника (Svid): "+mySat.getSvid()+"\n"+//Идентификационный номер спутника (Svid)
-				 "Группа спутников: "+mySat.getConstellationType()+" "+getCountry(mySat.getConstellationType())+"\n"+//Группа
-				 "Азимут спутника: "+mySat.getAzimuthDegrees()+"°"+"\n"+//Азимут спутника
-				 "Угол возвышения: "+mySat.getElevationDegrees()+"°"+"\n"+//Высота спутника
-				 "Несущая частота: "+(mySat.getCarrierFrequencyHz()/1000000)+" МГц"+"\n"+//Несущаю частота
-				 "Плотность отношения несущей к шуму основной полосы частот спутника: "+mySat.getBasebandCn0DbHz()+" ДБ-Гц"+"\n"+//Плотность отношения несущей к шуму основной полосы частот спутника
-				 "Плотность отношения несущей к шуму на антенне спутника: "+mySat.getCn0DbHz()+" ДБ-Гц"+"\n"+//Плотность отношения несущей к шуму на антенне спутника
-				 "Альманах: "+mySat.hasAlmanacData()+"\n"+//hasAlmanacData
-				 "Эфемеридные данные: "+mySat.hasEphemerisData()+"\n"+//hasEphemerisData
-				 "Использовался ли спутник в расчете самой последней фиксации положения: "+ mySat.usedInFix();//Использовался ли спутник в расчете самой последней фиксации положения
-				 */
-
-
-
+				
 
 				mysortI++;
 			}//закончился цикл
@@ -2214,7 +2194,7 @@ public class MainActivity extends Activity implements SharedConstants
 
 
 
-
+            
 			//связано
 			if((averageCn0DbHz<20)&&(!poor_gps_boolean)){
 				poor_gps_boolean=true;//чтобы в блок кода снова не попасть при постоянных вызовах
@@ -2225,17 +2205,18 @@ public class MainActivity extends Activity implements SharedConstants
 
 			if(averageCn0DbHz>20){
 				poor_gps_boolean=false;//разблокируем возможность попадание в блок кода выше
-				if(worker.t!=null){worker.t.interrupt();}//просим завершиться поток (при этом прервётся цикл while(!t.isInterrupted()), который нам вызывает playNotificationSound())
+				if(worker!=null&& worker.t!=null){worker.t.interrupt();}//просим завершиться поток (при этом прервётся цикл while(!t.isInterrupted()), который нам вызывает playNotificationSound())
 			}
 
 
 
 			if(countUsedFix!=0){
 				poor_gps_boolean=false;//разблокируем возможность попадание в блок кода выше
-				if(worker.t!=null){worker.t.interrupt();}//просим завершиться поток (при этом прервётся цикл while(!t.isInterrupted()), который нам вызывает playNotificationSound())
+				if(worker!=null&& worker.t!=null){worker.t.interrupt();}//просим завершиться поток (при этом прервётся цикл while(!t.isInterrupted()), который нам вызывает playNotificationSound())
 			}
 			//связано
-
+			
+    
 
 
 
