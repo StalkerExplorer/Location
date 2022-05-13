@@ -60,6 +60,11 @@ public class SatelliteAdapter extends SimpleAdapter
 			
 			//linearLayout.setBackgroundColor(Color.parseColor("#2e2e2e"));
 			textViewSvid.setBackgroundColor(Color.parseColor("#2e2e2e"));
+			
+			if(MainActivity.usedInFixFlash[position]){
+				textViewSvid.setBackgroundColor(Color.parseColor("#696969"));
+			}
+			
 			textViewCountry1.setBackgroundColor(Color.parseColor("#2e2e2e"));
 			textViewBaseband.setBackgroundColor(Color.parseColor("#2e2e2e"));
 			myViewBasebandCn0DbHz.setBackgroundColor(Color.parseColor("#2e2e2e"));
