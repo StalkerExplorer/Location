@@ -59,6 +59,14 @@ public class MainActivity extends Activity implements SharedConstants
 	ArrayList arrayLis;
 	ArrayList array;
 	HashMap hashMap;
+	
+	public static boolean usedInFixFlash[];
+	ArrayList arrayMemory;
+	String constellationType1;
+	boolean used1;
+	String constellationType2;
+	boolean used2;
+	int svid1,svid2;
 
 	public static boolean usedInFix[];
 
@@ -690,6 +698,7 @@ public class MainActivity extends Activity implements SharedConstants
 		viewPager.registerOnPageChangeCallback(onPageChangeCallback);//регистрируем Listener
         //было в metod2
 		myBooleanArray=new HashMap();
+		arrayMemory=new ArrayList();
 		
 		if(privacePolicy()){
 			permission();
@@ -1866,6 +1875,7 @@ public class MainActivity extends Activity implements SharedConstants
 			basebandCn0DbHz=null;
 			elevation=null;
 			azimuth=null;
+			usedInFixFlash=null;
 			usedInFix=new boolean[size];
 			svid=new String[size];
 			constellationType=new String[size];
@@ -1874,6 +1884,7 @@ public class MainActivity extends Activity implements SharedConstants
 			elevation=new float[size];
 			azimuth=new float[size];
 
+			usedInFixFlash=new boolean[size];
 			//теперь, после сортировки arraylist, цикл for-each:
 			for(MySatellite mySat:array){//начался цикл
 
@@ -1889,6 +1900,62 @@ public class MainActivity extends Activity implements SharedConstants
 				//отдельно инициализируем булев массив (используется в адаптере (метод getView()))
                 usedInFix[mysortI]=mySat.getUsedInFix();
 
+				//теперь нам надо существующий в данный момент массив фикса array
+				//сравнить с предыдущим массивом фикса
+				//переберем весь массив фикса 
+				//возьмем единственный элемент из массива array (это в данный момент mySat проходящего цикла)
+				//и проверим есть ли такой же элемент в старом массиве
+
+				//у единственного в данный момент mySat, который в итерации
+				//извлечем данные для сравнения:
+                constellationType1=mySat.getConstellationType();//группа спутников
+				svid1=mySat.getSvid();//идентификационный номер в данной группе спутников
+				used1=mySat.getUsedInFix();//используется ли спутник в данный момент для фиксации
+
+				//если спутник используется в данный момент для фиксации
+				if(used1){//if(used1) //будем перебирать весь предыдущий массив и сравнивать
+
+
+					//переберем циклом весь предыдущий массив, и сравним с этими данными
+					for(MySatellite mySatMemory:arrayMemory){//for2
+
+					
+					    //инициализируемся
+						constellationType2=mySatMemory.getConstellationType();
+						svid2=mySatMemory.getSvid();
+						used2=mySatMemory.getUsedInFix();
+
+
+
+
+						if(
+						//если данные использующегося в данный момент для фиксации спутника совпадают
+						//с данными одного из предыдущих спутников
+							constellationType1.equals(constellationType2)&&
+							svid1==svid2&&
+							used1==used2//и при этом предыдущий спутник тоже использовался для фиксации
+						//значит ничего не поменялось, мы подключены к тому же спутнику
+							){
+							usedInFixFlash[mysortI]=false;//и инициализируемся false
+							break;//покидаем цикл и перебираем на совпадение следующий
+						}else{
+							usedInFixFlash[mysortI]=true;//инициализируемся true (значит мы подключились к новому спутнику)
+						}
+
+
+					}//for2
+
+
+					//то использующийся в данный момент для фиксации спутник - новый (мы подключились к новому/другому)
+					//usedInFixFlash[mysortI]=true;
+
+				}//if(used1)
+				
+				
+				
+				
+				
+				
 				
 
 				mysortI++;
@@ -1959,6 +2026,11 @@ public class MainActivity extends Activity implements SharedConstants
 
 		    //восстановление точной позиции списка (этот метод периодически вызывает GnssStatusCallback, а мы список пальцем катаем. Если не проделать сохранение/востановление - список будет прыгать при вызовах)
 			listView.onRestoreInstanceState(state);
+			
+			//после того как данные отданы адаптеру
+			//запоминаем массив для сравнения с массивом при следующем фиксе
+			arrayMemory.clear();//при этом всё предыдущее содержимое удаляем
+			arrayMemory.addAll(array);//вот, теперь запоминаем
 
 		}//если вторая стр
 	}
